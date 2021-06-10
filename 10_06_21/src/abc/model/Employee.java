@@ -6,22 +6,19 @@ public class Employee {
 	private String firstName;
 	private String lastName;
 	private String email;
-	
+	private EmployeeType employeeType;
+	public static int max=10;
 	public Employee() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
-
-
-
-	public Employee(Integer employeeId, String firstName, String lastName, String email) {
+	public Employee(Integer employeeId, String firstName, String lastName, String email,EmployeeType employeeType) {
 		super();
 		this.employeeId = employeeId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
+		this.employeeType=employeeType;
 	}
-	
 	public Integer getEmployeeId() {
 		return employeeId;
 	}
@@ -46,16 +43,11 @@ public class Employee {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-
-
+	
 	@Override
 	public String toString() {
 		return "Employee [employeeId=" + employeeId + ", firstName=" + firstName + ", lastName=" + lastName + ", email="
-				+ email + "]";
+				+ email + " Employee Type= "+employeeType.getMessage() +"]";
 	}
 	
-	
-	
-
 }
