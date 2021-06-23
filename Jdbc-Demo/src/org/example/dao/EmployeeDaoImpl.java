@@ -1,100 +1,91 @@
 package org.example.dao;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
-import org.example.factory.MyConnectionFactory;
-import org.example.model.Employee;
+import javax.persistence.Query;
+
+import org.example.hibernate_crud_demo.factory.MySessionFactory;
+import org.example.hibernate_crud_demo.model.Employee;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+
 
 public class EmployeeDaoImpl implements EmployeeDao {
-	private List<Employee> list;
-	private MyConnectionFactory myConnectionFactory;
-	private Connection connection;
-	private static Scanner scanner = new Scanner(System.in);
-
-	public EmployeeDaoImpl() throws SQLException {
-
-		myConnectionFactory = MyConnectionFactory.createFactory();
-		connection = myConnectionFactory.getMyConnection();
+	
+	private MySessionFactory mySessionFactory;
+	private SessionFactory sessionFactory;
+	private Session session;
+	private static Scanner scanner=new Scanner(System.in);
+	
+	{
+		mySessionFactory=MySessionFactory.createMySessionFactory();
+		sessionFactory=mySessionFactory.getSessionFactory();
+		session=sessionFactory.openSession();
 	}
 
 	@Override
-	public Employee createEmployee(Employee employee) throws SQLException {
-
-		PreparedStatement preparedStatement = connection
-				.prepareStatement("insert into employee(id,first_name,last_name,email) values(?,?,?,?)");
-		preparedStatement.setInt(1, employee.getId());
-		preparedStatement.setString(2, employee.getFirstName());
-		preparedStatement.setString(3, employee.getLastName());
-		preparedStatement.setString(4, employee.getEmail());
-		int result = preparedStatement.executeUpdate();
-		System.out.println(result + "rows added");
+	public Employee createEmployee(Employee employee) {
+		session=sessionFactory.openSession();
+		session.getTransaction().begin();
+		session.save(employee);
+		session.getTransaction().commit();
 		return employee;
 	}
 
+	
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Employee> getAllEmployees() throws SQLException {
-		list = new ArrayList<Employee>();
-		Statement statement = connection.createStatement();
-		ResultSet resultSet = statement.executeQuery("select * from employee");
-
-		while (resultSet.next()) {
-			list.add(new Employee(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
-					resultSet.getString(4)));
-		}
-
-		return list;
+	public List<Employee> displayAllEmployee() {
+		session=sessionFactory.openSession();
+	
+		Query query=session.createQuery("select E from Employee E");
+		return query.getResultList();
+		
 	}
 
 	@Override
-	public List<Employee> findById(Integer id) throws SQLException {
-		list = new ArrayList<Employee>();
-		PreparedStatement preparedStatement = connection.prepareStatement("select * from employee where id=?");
-		preparedStatement.setInt(1, id);
-		ResultSet resultSet = preparedStatement.executeQuery();
-		while (resultSet.next()) {
-			list.add(new Employee(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
-					resultSet.getString(4)));
-
-		}
-
-		return list;
+	public Employee getemployeeById(Integer id) {
+		session=sessionFactory.openSession();
+		return session.get(Employee.class, id);
 	}
 
 	@Override
-	public Employee updateEmployee(Integer id) throws SQLException, EmployeeNotFoundException {
-		List<Employee> employees = findById(id);
-		if (employees.isEmpty()) {
-			throw new EmployeeNotFoundException("employee not found with id: " + id);
+	public Employee updateEmployee(Integer id) {
+		session=sessionFactory.openSession();
+		Employee tempEmployee= session.get(Employee.class, id);
+		if(tempEmployee ==null)
+		{
+			
+			throw new EmployeeNotFoundException("employee not found.");
+			
 		}
+		System.out.print("First Name: ");
+		String firstName=scanner.next();
+		System.out.print("Last Name: ");
+		String lastName=scanner.next();
+		System.out.print("Email: ");
+		String email=scanner.next();
+		tempEmployee.setFirstName(firstName);
+		tempEmployee.setLastName(lastName);
+		tempEmployee.setEmail(email);
+		session.getTransaction().begin();
+		//merge for update an existing entity
+		session.merge(tempEmployee);
+		session.getTransaction().commit();
+		
+		return tempEmployee;
+		
+		
+	}
 
-		System.out.println("enter new first name: ");
-		String firstName = scanner.next();
-		System.out.println("enter new last name: ");
-		String lastName = scanner.next();
-		System.out.println("enter new email: ");
-		String email = scanner.next();
+	@Override
+	public void deleteEmployee(Integer id) {
+		// TODO Auto-generated method stub
 
-		PreparedStatement preparedStatement = connection
-				.prepareStatement("update employee set first_name=?,last_name=?,email=? where id=?");
-		preparedStatement.setString(1, firstName);
-		preparedStatement.setString(2, lastName);
-		preparedStatement.setString(3, email);
-		preparedStatement.setInt(4, id);
-		preparedStatement.executeUpdate();
-		System.out.println("updation sucessfull!");
-		Employee employee = employees.get(0);
-		employee.setFirstName(firstName);
-		employee.setLastName(lastName);
-		employee.setEmail(email);
-		return employee;
 	}
 
 }

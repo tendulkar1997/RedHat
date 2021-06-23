@@ -1,17 +1,14 @@
 package org.example.dao;
 
-public class EmployeeNotFoundException extends Exception {
-	
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class EmployeeNotFoundException extends RuntimeException {
+	private static final long serialVersionUID = -8095768362454806353L;
 	private String message;
-
-	public EmployeeNotFoundException(String message) {
-		super();
-		this.message = message;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-	
 
 }

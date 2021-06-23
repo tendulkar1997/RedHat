@@ -1,13 +1,47 @@
 package org.example.service;
 
-import java.sql.SQLException;
 import java.util.List;
 
-import org.example.model.Employee;
+import org.example.hibernate_crud_demo.dao.EmployeeDao;
+import org.example.hibernate_crud_demo.dao.EmployeeDaoImpl;
+import org.example.hibernate_crud_demo.model.Employee;
 
-public interface EmployeeService {
-public Employee createEmployee(Employee employee) throws SQLException;
-	public List<Employee> getAllEmployees()throws SQLException;
-	public List<Employee> findById(Integer id)throws SQLException;
-	public Employee updateEmployee(Integer id)throws SQLException;
+public class EmployeeServiceImpl implements EmployeeService {
+
+	private EmployeeDao employeeDao;
+	
+	{
+		employeeDao = new EmployeeDaoImpl();
+	}
+
+	@Override
+	public Employee createEmployee(Employee employee) {
+		// TODO Auto-generated method stub
+		return employeeDao.createEmployee(employee);
+	}
+
+	@Override
+	public List<Employee> displayAllEmployee() {
+		// TODO Auto-generated method stub
+		return employeeDao.displayAllEmployee();
+	}
+
+	@Override
+	public Employee getemployeeById(Integer id) {
+		// TODO Auto-generated method stub
+		return employeeDao.getemployeeById(id);
+	}
+
+	@Override
+	public Employee updateEmployee(Integer id) {
+		// TODO Auto-generated method stub
+		return employeeDao.updateEmployee(id);
+	}
+
+	@Override
+	public void deleteEmployee(Integer id) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
